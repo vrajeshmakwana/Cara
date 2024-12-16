@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        .form-container {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 500px;
+            margin: 1rem;
+        }
+
+        .form-title {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .form-floating>label {
+            color: #6c757d;
+        }
+
+        .form-control:focus {
+            border-color: #4c84ff;
+            box-shadow: 0 0 0 0.2rem rgba(76, 132, 255, 0.25);
+        }
+
+        .btn-primary {
+            background: #4c84ff;
+            border: none;
+            padding: 0.8rem 2rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #3b76ff;
+            transform: translateY(-1px);
+        }
+
+        .form-text {
+            font-size: 0.875rem;
+        }
+
+        .invalid-feedback {
+            font-size: 0.875rem;
+        }
+
+        .password-strength {
+            height: 4px;
+            margin-top: 0.5rem;
+            border-radius: 2px;
+            background: #e9ecef;
+            overflow: hidden;
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            width: 0;
+            transition: width 0.3s ease;
+            background: #dc3545;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="form-container">
+        <h2 class="form-title text-center">Create Account</h2>
+        <form id="registrationForm" action="/" method="post" novalidate>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="name" placeholder="Full Name" name="name" required
+                    pattern="^[a-zA-Z ]{2,50}$">
+                <label for="name">Full Name</label>
+
+
+                <div class="invalid-feedback">
+                    Please enter a valid name (2-50 characters, letters only)
+                </div>
+                <!-- ===================== Server Side Validation using python and Jinja ======================= -->
+                {% if errors %}
+                <div class="alert alert-danger" style="text-align: center;">
+                    {{errors[0]}}
+
+                </div>
+                {% endif %}
+
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="email" class="form-control" id="email" placeholder="name@example.com" name="email"
+                    required>
+                <label for="email">Email address</label>
+                <div class="invalid-feedback">
+                    Please enter a valid email address
+                </div>
+                <!-- ===================== Server Side Validation using python and Jinja ======================= -->
+                {% if errors %}
+                <div class="alert alert-danger" style="text-align: center;">
+                    {{errors[1]}}
+
+                </div>
+                {% endif %}
+
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="password" class="form-control" id="password" placeholder="Password" name="password"
+                    required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$">
+                <label for="password">Password</label>
+                <div class="password-strength">
+                    <div class="password-strength-bar"></div>
+                </div>
+                <div class="form-text">Password must be at least 8 characters long with numbers, letters and special
+                    characters</div>
+                <div class="invalid-feedback">
+                    Password must meet the requirements
+                </div>
+                <!-- ===================== Server Side Validation using python and Jinja ======================= -->
+                {% if errors %}
+                <div class="alert alert-danger" style="text-align: center;">
+                    {{errors[2]}}
+
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-floating mb-4">
+                <input type="tel" class="form-control" id="mobile" placeholder="Mobile Number" required
+                    pattern="^[0-9]{10}$" name="mobile">
+                <label for="mobile">Mobile Number</label>
+                <div class="invalid-feedback">
+                    Please enter a valid 10-digit mobile number
+                </div>
+                <!-- ===================== Server Side Validation using python and Jinja ======================= -->
+                {% if errors %}
+                <div class="alert alert-danger" style="text-align: center;">
+                    {{errors[3]}}
+
+                </div>
+                {% endif %}
+            </div>
+
+            <button class="btn btn-primary w-100" id="btn" type="submit">Create Account</button>
+        </form>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('registrationForm');
+            const password = document.getElementById('password');
+            const email = document.getElementById("email");
+            const name = document.getElementById("name");
+            const mno = document.getElementById("mobile");
+            const strengthBar = document.querySelector('.password-strength-bar');
+
+            // Sanitize input
+            function sanitizeInput(input) {
+                return input.replace(/[<>&"'/]/g, '');
+            }
+
+            // Password strength checker
+            function checkPasswordStrength(password) {
+                let strength = 0;
+                if (password.length >= 8) strength += 25;
+                if (password.match(/[a-z]/)) strength += 25;
+                if (password.match(/[A-Z]/)) strength += 25;
+                if (password.match(/[0-9]/)) strength += 25;
+
+                strengthBar.style.width = strength + '%';
+
+                if (strength <= 25) {
+                    strengthBar.style.backgroundColor = '#dc3545';
+                } else if (strength <= 50) {
+                    strengthBar.style.backgroundColor = '#ffc107';
+                } else if (strength <= 75) {
+                    strengthBar.style.backgroundColor = '#0dcaf0';
+                } else {
+                    strengthBar.style.backgroundColor = '#198754';
+                }
+            }
+
+            // Input event listeners for sanitization
+            form.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', function () {
+                    this.value = sanitizeInput(this.value);
+                    if (this.id === 'password') {
+                        checkPasswordStrength(this.value);
+                    }
+                });
+            });
+            // Form submission
+            form.addEventListener('submit', function (e) {
+                if (name.value === "" || email.value === "" || mno.value === "" || password.value === "") {
+                    e.preventDefault();
+                    form.classList.add('was-validated');
+                } else {
+                    // Here you would typically send the data to your server
+                    alert('Form submitted successfully!');
+                    form.classList.remove('was-validated');
+                    strengthBar.style.width = '0';
+                }
+            });
+
+
+        });
+
+
+    </script>
+</body>
